@@ -62,18 +62,25 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic)
         printf("Start Addr: %x | Length: %u KB | Type: %d\n | AddressInKB %u KB\n",
             MemStartAddr, (size_t)(MemLen/1024), MemType, MemStartAddrKB);
         
-    if (MemType==1){
-			pmmngr_init_region (MemStartAddr, MemLen);
-            printf("The Activated Region start address: 0x%x",MemStartAddr);
+    if ((MemType==1)){
+			pmmngr_init_region (MemStartAddr, (size_t)(MemLen));
+            printf("The Activated Region start address: 0x%x\n",MemStartAddr);
     }
        
     }
-    pmmngr_deinit_region(&_start,&_end_kernel-&_start+2*sizeof(uint8_t));
+    pmmngr_deinit_region(0x20000c,&_end_kernel-&_start);
     printf("\n\n");
     printf("\npmm regions initialized: %i allocation blocks; used or reserved blocks: %i\nfree blocks: %i\n",
 		pmmngr_get_block_count (),  pmmngr_get_use_block_count (), pmmngr_get_free_block_count () );
 
-    
+    uint32_t* p = (uint32_t*)pmmngr_alloc_block ();
+	printf("\np allocated at 0x%x", p);
+    uint32_t* p2 = (uint32_t*)pmmngr_alloc_block ();
+    printf("\np2 allocated at 0x%x",p2);
+	pmmngr_free_block (p);
+    uint32_t* p3=(uint32_t*)pmmngr_alloc_block();
+    printf("\np3 allocated at 0x%x",p3);
+
 end:
     for (;;);
 }
