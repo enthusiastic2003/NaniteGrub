@@ -46,12 +46,12 @@ SECTIONS
 		__bss_start = .;
 		*(COMMON)
 		*(.bss)
-		__end = .;
+		__bss_end = .;
 		
 	}
  
 	/* The compiler may produce other sections, by default it will put them in
 	   a segment with the same name. Simply add stuff here as needed. */
-	
-	
+	_end_kernel = .;
+
 }
