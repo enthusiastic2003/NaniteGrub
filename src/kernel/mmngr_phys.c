@@ -12,7 +12,7 @@
 //! 8 blocks per byte
 #define PMMNGR_BLOCKS_PER_BYTE 8
 
-//! block size (4k)
+//! block sizeMem (4k)
 #define PMMNGR_BLOCK_SIZE	4096
 
 //! block alignment
@@ -36,7 +36,7 @@ unsigned int page_table[NUM_PAGES] __attribute__((aligned(PAGE_FRAME_SIZE)));
 //    IMPLEMENTATION PRIVATE DATA
 //============================================================================
 
-//! size of physical memory
+//! sizeMem of physical memory
 uint32_t	_mmngr_memory_size=0;
 
 //! number of blocks currently in use
@@ -67,8 +67,8 @@ inline bool mmap_test (int bit);
 //! finds first free frame in the bit array and returns its index
 int mmap_first_free ();
 
-//! finds first free "size" number of frames and returns its index
-int mmap_first_free_s (size_t size);
+//! finds first free "sizeMem" number of frames and returns its index
+int mmap_first_free_s (size_t sizeMem);
 
 //============================================================================
 //    IMPLEMENTATION PRIVATE FUNCTIONS
@@ -108,13 +108,13 @@ int mmap_first_free () {
 	return -1;
 }
 
-//! finds first free "size" number of frames and returns its index
-int mmap_first_free_s (size_t size) {
+//! finds first free "sizeMem" number of frames and returns its index
+int mmap_first_free_s (size_t sizeMem) {
 
-	if (size==0)
+	if (sizeMem==0)
 		return -1;
 
-	if (size==1)
+	if (sizeMem==1)
 		return mmap_first_free ();
 
 	for (uint32_t i=0; i<pmmngr_get_block_count() /32; i++)
@@ -128,13 +128,13 @@ int mmap_first_free_s (size_t size) {
 					startingBit+=bit;		//get the free bit in the dword at index i
 
 					uint32_t free=0; //loop through each bit to see if its enough space
-					for (uint32_t count=0; count<=size;count++) {
+					for (uint32_t count=0; count<=sizeMem;count++) {
 
 						if (! mmap_test (startingBit+count) )
 							free++;	// this bit is clear (free frame)
 
-						if (free==size)
-							return i*4*8+j; //free count==size needed; return index
+						if (free==sizeMem)
+							return i*4*8+j; //free count==sizeMem needed; return index
 					}
 				}
 			}
@@ -157,10 +157,10 @@ void	pmmngr_init (size_t memSize, physical_addr bitmap) {
 	memset (_mmngr_memory_map, 0xf, pmmngr_get_block_count() / PMMNGR_BLOCKS_PER_BYTE );
 }
 
-void	pmmngr_init_region (physical_addr base, size_t size) {
+void	pmmngr_init_region (physical_addr base, size_t sizeMem) {
 
 	int align = base / PMMNGR_BLOCK_SIZE;
-	int blocks = size / PMMNGR_BLOCK_SIZE;
+	int blocks = sizeMem / PMMNGR_BLOCK_SIZE;
 
 	for (; blocks>=0; blocks--) {
 		mmap_unset (align++);
@@ -172,10 +172,10 @@ void	pmmngr_init_region (physical_addr base, size_t size) {
 	mmap_set (0);	//first block is always set. This insures allocs cant be 0
 }
 
-void	pmmngr_deinit_region (physical_addr base, size_t size) {
+void	pmmngr_deinit_region (physical_addr base, size_t sizeMem) {
 
 	int align = base / PMMNGR_BLOCK_SIZE;
-	int blocks = size / PMMNGR_BLOCK_SIZE;
+	int blocks = sizeMem / PMMNGR_BLOCK_SIZE;
 
 	for (; blocks>=0; blocks--) {
 		mmap_set (align++);
@@ -212,34 +212,34 @@ void	pmmngr_free_block (void* p) {
 	_mmngr_used_blocks--;
 }
 
-void*	pmmngr_alloc_blocks (size_t size) {
+void*	pmmngr_alloc_blocks (size_t sizeMem) {
 
-	if (pmmngr_get_free_block_count() <= size)
+	if (pmmngr_get_free_block_count() <= sizeMem)
 		return 0;	//not enough space
 
-	int frame = mmap_first_free_s (size);
+	int frame = mmap_first_free_s (sizeMem);
 
 	if (frame == -1)
 		return 0;	//not enoasdaugh space
 
-	for (uint32_t i=0; i<size; i++)
+	for (uint32_t i=0; i<sizeMem; i++)
 		mmap_set (frame+i);
 
 	physical_addr addr = frame * PMMNGR_BLOCK_SIZE;
-	_mmngr_used_blocks+=size;
+	_mmngr_used_blocks+=sizeMem;
 
 	return (void*)addr;
 }
 
-void	pmmngr_free_blocks (void* p, size_t size) {
+void	pmmngr_free_blocks (void* p, size_t sizeMem) {
 
 	physical_addr addr = (physical_addr)p;
 	int frame = addr / PMMNGR_BLOCK_SIZE;
 
-	for (uint32_t i=0; i<size; i++)
+	for (uint32_t i=0; i<sizeMem; i++)
 		mmap_unset (frame+i);
 
-	_mmngr_used_blocks-=size;
+	_mmngr_used_blocks-=sizeMem;
 }
 
 size_t	pmmngr_get_memory_size () {

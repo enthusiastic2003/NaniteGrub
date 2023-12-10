@@ -2,6 +2,7 @@
 #define __MMNGR_PHYS_H
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 //Physical Memory manager
 typedef uint32_t physical_addr;
 //! initialize the physical memory manager
@@ -44,7 +45,7 @@ uint32_t pmmngr_get_block_size ();
 void __attribute__((cdecl))	pmmngr_paging_enable (bool);
 
 //! test if paging is enabled
-bool __attribute__((cdecl))	pmmngr_is_paging ();
+bool __attribute__((cdecl))	pmmngr_is_paging();
 
 //! loads the page directory base register (PDBR)
 void __attribute__((cdecl))	pmmngr_load_PDBR (unsigned int *);
