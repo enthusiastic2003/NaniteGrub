@@ -6,13 +6,16 @@ CFLAGS=-std=gnu99 -ffreestanding -O2 -Wall -Wextra -nostdlib -c
 all: folder_req boot $(ASM_OBJS) $(COBJS)
 
 boot: 
-	$(GAS) boot.s -o $(BUILD_DIR)/boot/boot.o
+	@$(GAS) boot.s -o $(BUILD_DIR)/boot/boot.o
+	@echo "Compiled: boot.s"
 
 $(ASM_OBJS):  %.o: %.asm
-	nasm -f elf32 $< -o $(BUILD_DIR)/boot/$@
+	@nasm -f elf32 $< -o $(BUILD_DIR)/boot/$@
+	@echo "Compiled: $<"
 
 $(COBJS): %.o: %.c
-	$(CC1) $(CFLAGS) $< -o $(BUILD_DIR)/boot/$@
+	@$(CC1) $(CFLAGS) $< -o $(BUILD_DIR)/boot/$@
+	@echo "Compiled: $<"
 
 
 folder_req:

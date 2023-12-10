@@ -14,13 +14,12 @@ export
 
 
 link: obj
-	$(LD) -T linker.ld -o $(BUILD_DIR)/Nanite.bin $(LDFLAGS) $(OBJ_PAIRS_BOOT) $(OBJ_PAIRS_KERNEL) $(LD_LIBS)
-
+	@$(LD) -T linker.ld -o $(BUILD_DIR)/Nanite.bin $(LDFLAGS) $(OBJ_PAIRS_BOOT) $(OBJ_PAIRS_KERNEL) $(LD_LIBS)
+	@echo "Linking: $(OBJ_PAIRS_BOOT) $(OBJ_PAIRS_KERNEL) lgcc"
 
 obj: $(SUBDIRS)
 
 $(SUBDIRS):
-	$(MAKE) -C $@ BUILD_DIR=$(BUILD_DIR)
-
+	$(MAKE) -C $@
 
 
