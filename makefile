@@ -1,13 +1,15 @@
 SUBDIRS := kernel boot
 LD = "$(HOME)/toolchains/bin/i686-elf-gcc"
 CC1="$(HOME)/toolchains/bin/i686-elf-gcc"
-AS="$(HOME)/toolchains/bin/i686-elf-as"
+NASM="nasm"
+GAS="$(HOME)/toolchains/bin/i686-elf-as"
 LDFLAGS = -ffreestanding -O2 -nostdlib
 ISO_NAME = NaniteOS.iso
 ISO_MOUNT_DIR = isodir
 BUILD_DIR=$(PWD)/build
-.PHONY: iso clean $(SUBDIRS)
 export
+.PHONY: iso clean $(SUBDIRS)
+
 $(SUBDIRS):
 	$(MAKE) -C src/ link
 
